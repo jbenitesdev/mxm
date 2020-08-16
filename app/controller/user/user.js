@@ -1,8 +1,10 @@
 const User = require('../../models/user');
+const jwt = require('jsonwebtoken');
+
 
 module.exports = {
     create: async (req, res) => {
-        const { InterfacedoCliente } = req.body;
+        const { InterfacedoCliente, AutheticationToken } = req.body;
         let SequenciadoRegistro
         let Codigo
         let TipodePessoa
@@ -100,6 +102,9 @@ module.exports = {
         let IndicadorGrupoPrincipal
         let IdentificadorTipoServico
         let CodigoAtividadeEconomica
+        let Username = AutheticationToken.Username
+        let Password = AutheticationToken.Password
+        let EnvironmentName = AutheticationToken.EnvironmentName
 
         InterfacedoCliente.map(inter => {
             SequenciadoRegistro = inter.SequenciadoRegistro
@@ -216,6 +221,11 @@ module.exports = {
 
 
         const user = await User.create({
+            AutheticationToken: {
+                Username,
+                Password,
+                EnvironmentName
+            },
             InterfacedoCliente: [
                 {
                     SequenciadoRegistro,

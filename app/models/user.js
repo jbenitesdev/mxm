@@ -1,5 +1,10 @@
 const mongoose = require('mongoose');
 const UserSchema = new mongoose.Schema({
+    AutheticationToken: {
+        Username: String,
+        Password: String,
+        EnvironmentName: String
+    },
     InterfacedoCliente: [
         {
             SequenciadoRegistro: Number,
