@@ -1,10 +1,13 @@
 const User = require('../../models/user');
 const jwt = require('jsonwebtoken');
-
+const bcrypt = require('bcryptjs')
 
 module.exports = {
     create: async (req, res) => {
-        const { InterfacedoCliente, AutheticationToken } = req.body;
+        // AutheticationToken
+        const { Data, AutheticationToken } = req.body;
+
+        // console.log('req.body ===' , req.body)
         let SequenciadoRegistro
         let Codigo
         let TipodePessoa
@@ -88,10 +91,10 @@ module.exports = {
         let CodigoMoeda
         let NumeroContaContabil
         let NumeroContaContabilAntecipacao
-        
+
         //array dentro do terceiro array
         let InterfaceGrupoRecebimentodoCliente = []
-       
+
         let CodigoGrupoRecebimento
         let CodigoImpostoIRRF
         let CodigoImpostoINSS
@@ -106,7 +109,7 @@ module.exports = {
         let Password = AutheticationToken.Password
         let EnvironmentName = AutheticationToken.EnvironmentName
 
-        InterfacedoCliente.map(inter => {
+        Data.InterfacedoCliente.map(inter => {
             SequenciadoRegistro = inter.SequenciadoRegistro
             Codigo = inter.Codigo
             TipodePessoa = inter.TipodePessoa
@@ -162,7 +165,6 @@ module.exports = {
             })
             InterfaceEnderecodoCliente = inter.InterfaceEnderecodoCliente
             InterfaceEnderecodoCliente.map(iec => {
-                console.log('iecc', iec)
                 SequenciaClienteEndereco = iec.SequenciaClienteEndereco
                 CodigoEnderecoAlternativo = iec.CodigoEnderecoAlternativo
                 DescricaoEnderecoAlternativo = iec.DescricaoEnderecoAlternativo
@@ -220,126 +222,135 @@ module.exports = {
         })
 
 
-        const user = await User.create({
-            AutheticationToken: {
-                Username,
-                Password,
-                EnvironmentName
-            },
-            InterfacedoCliente: [
-                {
-                    SequenciadoRegistro,
-                    Codigo,
-                    TipodePessoa,
-                    Nome,
-                    CPFouCNPJ,
-                    NomeFantansia,
-                    TipodoLocaldoIndicadordeInscricaoEstadual,
-                    Inscricao,
-                    InscricaoMunicipal,
-                    InscricaoSuframa,
-                    OrgaoExpeditor,
-                    DatadaExpedicao,
-                    DatadeNascimento,
-                    CodigodaNacionalidade,
-                    EstadoCivil,
-                    Profissao,
-                    CodigodoGrupo,
-                    CodigodoPais,
-                    Cep,
-                    Endereco,
-                    NumerodoEndereco,
-                    ComplementodoEndereco,
-                    Bairro,
-                    Uf,
-                    Cidade,
-                    Email,
-                    Telefone,
-                    CodigodaCidade,
-                    Ativo,
-                    DatadoCadastro,
-                    DatadeAtualizacao,
-                    DatadeInativacao,
-                    Pais,
-                    InterfaceContaCorrentedoCliente: [
-                        {
-                            SequenciadaConta,
-                            CodigodoCliente,
-                            CodigodaContaCorrente,
-                            CodigodoBanco,
-                            NomedoBanco,
-                            AgenciadoBanco,
-                            NomedaAgencia,
-                            EnderecodaAgencia,
-                            BairrodaAgencia,
-                            CidadedaAgencia,
-                            UFdaAgencia,
-                            CepdaAgencia,
-                            NumerodaContaBancaria,
-                            TipodeConta,
-                            Competencia,
-                            OperacaodeIntegracao
-                        }
-                    ],
-                    InterfaceEnderecodoCliente: [
-                        {
-                            SequenciaClienteEndereco,
-                            CodigoEnderecoAlternativo,
-                            DescricaoEnderecoAlternativo,
-                            NomeCliente,
-                            EnderecoAlernativo,
-                            Numero,
-                            Complemento,
-                            BairroAlternativo,
-                            CidadeAlternativo,
-                            UFAlternativo,
-                            CEPAlternativo,
-                            TelefoneAlternativo,
-                            CNPJAlternativo,
-                            InscricaoEstadualAlternativo,
-                            CodigoRegiaoAlternativo,
-                            EmailAlternativo,
-                            InscricaoMunicipalAlternativo,
-                            InscricaoSUFRAMAAlternativo,
-                            CodigoCidadeIBGEAlternativo,
-                            CodigoPaisIBGEAlternativo,
-                            TipoLocalIndicadorInscricaoEstadualAlternativo,
-                            OperacaodeIntegracaoAlternativo
-                        }
-                    ],
-                    InterfaceContabildoCliente: [
-                        {
-                            CodigoCliente,
-                            CodigoEmpresa,
-                            CodigoFilial,
-                            CodigoMoeda,
-                            NumeroContaContabil,
-                            NumeroContaContabilAntecipacao,
-                            OperacaodeIntegracao,
-                            InterfaceGrupoRecebimentodoCliente: [
-                                {
-                                    CodigoCliente,
-                                    CodigoEmpresa,
-                                    CodigoFilial,
-                                    CodigoMoeda,
-                                    CodigoGrupoRecebimento,
-                                    CodigoImpostoIRRF,
-                                    CodigoImpostoINSS,
-                                    CodigoImpostoISS,
-                                    CodigoImpostoPIS,
-                                    CodigoImpostoCOFINS,
-                                    CodigoImpostoContribuicaoSocial,
-                                    IndicadorGrupoPrincipal,
-                                    IdentificadorTipoServico,
-                                    CodigoAtividadeEconomica
-                                }
-                            ]
-                        }
-                    ]
-                }
-            ]
-        })
+        const user = await User.create(
+            {
+                AutheticationToken: {
+                    Username: Username,
+                    Password: Password,
+                    EnvironmentName: EnvironmentName
+                },
+                InterfacedoCliente: [
+                    {
+                        SequenciadoRegistro,
+                        Codigo,
+                        TipodePessoa,
+                        Nome,
+                        CPFouCNPJ,
+                        NomeFantansia,
+                        TipodoLocaldoIndicadordeInscricaoEstadual,
+                        Inscricao,
+                        InscricaoMunicipal,
+                        InscricaoSuframa,
+                        OrgaoExpeditor,
+                        DatadaExpedicao,
+                        DatadeNascimento,
+                        CodigodaNacionalidade,
+                        EstadoCivil,
+                        Profissao,
+                        CodigodoGrupo,
+                        CodigodoPais,
+                        Cep,
+                        Endereco,
+                        NumerodoEndereco,
+                        ComplementodoEndereco,
+                        Bairro,
+                        Uf,
+                        Cidade,
+                        Email,
+                        Telefone,
+                        CodigodaCidade,
+                        Ativo,
+                        DatadoCadastro,
+                        DatadeAtualizacao,
+                        DatadeInativacao,
+                        Pais,
+                        InterfaceContaCorrentedoCliente: [
+                            {
+                                SequenciadaConta,
+                                CodigodoCliente,
+                                CodigodaContaCorrente,
+                                CodigodoBanco,
+                                NomedoBanco,
+                                AgenciadoBanco,
+                                NomedaAgencia,
+                                EnderecodaAgencia,
+                                BairrodaAgencia,
+                                CidadedaAgencia,
+                                UFdaAgencia,
+                                CepdaAgencia,
+                                NumerodaContaBancaria,
+                                TipodeConta,
+                                Competencia,
+                                OperacaodeIntegracao
+                            }
+                        ],
+                        InterfaceEnderecodoCliente: [
+                            {
+                                SequenciaClienteEndereco,
+                                CodigoEnderecoAlternativo,
+                                DescricaoEnderecoAlternativo,
+                                NomeCliente,
+                                EnderecoAlernativo,
+                                Numero,
+                                Complemento,
+                                BairroAlternativo,
+                                CidadeAlternativo,
+                                UFAlternativo,
+                                CEPAlternativo,
+                                TelefoneAlternativo,
+                                CNPJAlternativo,
+                                InscricaoEstadualAlternativo,
+                                CodigoRegiaoAlternativo,
+                                EmailAlternativo,
+                                InscricaoMunicipalAlternativo,
+                                InscricaoSUFRAMAAlternativo,
+                                CodigoCidadeIBGEAlternativo,
+                                CodigoPaisIBGEAlternativo,
+                                TipoLocalIndicadorInscricaoEstadualAlternativo,
+                                OperacaodeIntegracaoAlternativo
+                            }
+                        ],
+                        InterfaceContabildoCliente: [
+                            {
+                                CodigoCliente,
+                                CodigoEmpresa,
+                                CodigoFilial,
+                                CodigoMoeda,
+                                NumeroContaContabil,
+                                NumeroContaContabilAntecipacao,
+                                OperacaodeIntegracao,
+                                InterfaceGrupoRecebimentodoCliente: [
+                                    {
+                                        CodigoCliente,
+                                        CodigoEmpresa,
+                                        CodigoFilial,
+                                        CodigoMoeda,
+                                        CodigoGrupoRecebimento,
+                                        CodigoImpostoIRRF,
+                                        CodigoImpostoINSS,
+                                        CodigoImpostoISS,
+                                        CodigoImpostoPIS,
+                                        CodigoImpostoCOFINS,
+                                        CodigoImpostoContribuicaoSocial,
+                                        IndicadorGrupoPrincipal,
+                                        IdentificadorTipoServico,
+                                        CodigoAtividadeEconomica
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        )
 
         return res.send(user)
+    },
+
+    find: async (req, res) => {
+        const user = await User.find().cache({ expire: 10 });
+
+        res.json(user);
     }
+
 }

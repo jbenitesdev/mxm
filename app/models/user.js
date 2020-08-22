@@ -1,8 +1,19 @@
 const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
+
 const UserSchema = new mongoose.Schema({
     AutheticationToken: {
-        Username: String,
-        Password: String,
+        Username: {
+            type: String,
+            unique: true,
+            required: true,
+            lowercase: true
+        },
+        Password: {
+            type: String,
+            required: true,
+            select: true
+        },
         EnvironmentName: String
     },
     InterfacedoCliente: [
@@ -117,6 +128,13 @@ const UserSchema = new mongoose.Schema({
             ]
         }
     ]
+})
+
+UserSchema.pre('save', async function (next) {
+    console.log('this teste: ', this.AutheticationToken.Password)
+    const hash = await bcrypt.hash(this.AutheticationToken.Password, 10);
+    this.AutheticationToken.Password = hash;
+    next();
 })
 
 module.exports = mongoose.model('User', UserSchema);
